@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="02e4cf4d-f93e-47ad-9229-77b3d73c2237" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="JupyterTrust" id="83db4717-ed1d-4721-8622-5a1f9fd3ffb4" />
+  <component name="ProjectId" id="2064OQO8mSHe37w48531kG8os5K" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../AMLS_Week3.1" />
+      <recent name="$PROJECT_DIR$/../AMLS_Week4" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/.." />
+      <recent name="$PROJECT_DIR$/../../AMLS_Week3" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.Task_4.3">
+    <configuration name="TASK_3.9" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="AMLS_Week3" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.7" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../AMLS_Week3.1/TASK_3.9.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Task_3.10" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="AMLS_Week3" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.7" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../AMLS/AMLS_Week3" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../AMLS/AMLS_Week3/Task_3.10.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Task_4.3" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="AMLS" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../../venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../AMLS_Week4" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../AMLS_Week4/Task_4.3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.TASK_3.9" />
+      <item itemvalue="Python.Task_4.3" />
+      <item itemvalue="Python.Task_3.10" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="02e4cf4d-f93e-47ad-9229-77b3d73c2237" name="Default Changelist" comment="" />
+      <created>1635351670877</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1635351670877</updated>
+      <workItem from="1635351690882" duration="1640000" />
+      <workItem from="1635415121941" duration="10217000" />
+      <workItem from="1635871545950" duration="4324000" />
+      <workItem from="1635955377106" duration="350000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1864" y="93" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1635955460871">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state x="1864" y="93" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635955460871" />
+    <state width="1878" height="305" key="GridCell.Tab.0.bottom" timestamp="1635931925749">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="305" key="GridCell.Tab.0.bottom/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635931925749" />
+    <state width="1878" height="305" key="GridCell.Tab.0.bottom/0.23.1440.815/1440.-86.1920.1057@1440.-86.1920.1057" timestamp="1635435241856" />
+    <state width="1878" height="305" key="GridCell.Tab.0.center" timestamp="1635931925748">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="305" key="GridCell.Tab.0.center/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635931925748" />
+    <state width="1878" height="305" key="GridCell.Tab.0.center/0.23.1440.815/1440.-86.1920.1057@1440.-86.1920.1057" timestamp="1635435241853" />
+    <state width="1878" height="305" key="GridCell.Tab.0.left" timestamp="1635931925747">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="305" key="GridCell.Tab.0.left/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635931925747" />
+    <state width="1878" height="305" key="GridCell.Tab.0.left/0.23.1440.815/1440.-86.1920.1057@1440.-86.1920.1057" timestamp="1635435241852" />
+    <state width="1878" height="305" key="GridCell.Tab.0.right" timestamp="1635931925749">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state width="1878" height="305" key="GridCell.Tab.0.right/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635931925749" />
+    <state width="1878" height="305" key="GridCell.Tab.0.right/0.23.1440.815/1440.-86.1920.1057@1440.-86.1920.1057" timestamp="1635435241855" />
+    <state x="1901" y="70" key="SettingsEditor" timestamp="1635955761435">
+      <screen x="1440" y="-109" width="1920" height="1080" />
+    </state>
+    <state x="1901" y="70" key="SettingsEditor/0.0.1440.900/1440.-109.1920.1080@1440.-109.1920.1080" timestamp="1635955761435" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../AMLS/AMLS_Week3/main.py</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/pythonProject$TASK_3_9.coverage" NAME="TASK_3.9 Coverage Results" MODIFIED="1635352629749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../AMLS/AMLS_Week3" />
+    <SUITE FILE_PATH="coverage/AMLS_Week3$TASK_3_9.coverage" NAME="TASK_3.9 Coverage Results" MODIFIED="1635425660632" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AMLS_Week3$Task_4_3.coverage" NAME="Task_4.3 Coverage Results" MODIFIED="1635897411871" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../AMLS_Week4" />
+    <SUITE FILE_PATH="coverage/pythonProject$test01.coverage" NAME="test01 Coverage Results" MODIFIED="1635351936526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../test" />
+  </component>
+</project>
