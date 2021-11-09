@@ -1,46 +1,59 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from pandas import *
-import pandas as pd
-from sklearn.datasets import  load_iris
+import imageio
+import mpimg as mpimg
+import pandas
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn import metrics
-
-import tensorflow as tf
-
-import tensorflow as tf
-
-def decode_image(filename, channels):
-    value = tf.io.read_file(filename)
-    decoded_image = tf.image.decode_png(value, channels=channels)
-    return decoded_image
-
-def get_dataset(image_paths, channels):
-    filename_tensor = tf.constant(image_paths)
-    print(filename_tensor)
-    dataset = tf.data.Dataset.from_tensor_slices(filename_tensor)
-
-    def _map_fn(filename):
-        decode_images = decode_image(filename, channels=channels)
-        return decode_images
-
-    map_dataset = dataset.map(_map_fn) # we use the map method: allow to apply the function _map_fn to all the
-    # elements of dataset
-    return map_dataset
-
-def get_image_data(image_paths, channels):
-    dataset = get_dataset(image_paths, channels)
-    iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
-    next_image = iterator.get_next()
-
-    return next_image
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+import skimage
+from PIL import Image
+import random
 
 
-print(get_image_data('dataset/image/IMAGE_0000.jpg', 0))
+IMG_WIDTH=200
+IMG_HEIGHT=200
+img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image_test'
 
-# Loading the CSV file
-io_pairs = pandas.read_csv('dataset/label.csv')
-labels = io_pairs.drop('file_name',axis=1)
+def create_dataset_PIL(img_folder):
+    img_data_array=[]
+    class_name=[]
+    for file in os.listdir(img_folder):     #for all the files in dataset/image
+        print('Loading {}'.format(file))
+        image_path= os.path.join(img_folder, file)      #join the path to the image filename
+        image= np.array(Image.open(image_path))             #open and convert to numpy array
+        image= np.resize(image,(IMG_HEIGHT,IMG_WIDTH,3))        #rescale
+        image = image.astype('float32')                         #converto to float
+        image /= 255
+        img_data_array.append(image)                    #final list with all the image arrays
+        class_name.append(file)                             #image names
+    return img_data_array , class_name
 
-print(labels)
+PIL_img_data, class_name = create_dataset_PIL(img_folder)
+#print(class_name)
+print("\nTotal number of images: {}".format(len(PIL_img_data)))
+print("\nImage size: {}x{}x{}\n".format(len(PIL_img_data[0]), len(PIL_img_data[0][0]),  len(PIL_img_data[0][0][0]) ))
+
+#print(PIL_img_data[0])
+
+
+plt.figure(figsize=(20,20))
+
+for i in range(5):
+    file = random.choice(os.listdir(img_folder))
+    image_path= os.path.join(img_folder, file)
+    img = np.array(imageio.imread(image_path))
+    ax=plt.subplot(1,5,i+1)
+    ax.title.set_text(file)
+    plt.imshow(img)
+
+print(img)
+plt.show()
+
+
+print("\nImage size: {}x{}x{}\n".format(len(img), len(img[0]),  len(img[0][0]) ))
+
+
+
