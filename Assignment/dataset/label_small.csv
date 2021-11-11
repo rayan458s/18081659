@@ -1,0 +1,13 @@
+file_name,label
+IMAGE_0000.jpg,meningioma_tumor
+IMAGE_0001.jpg,no_tumor
+IMAGE_0002.jpg,meningioma_tumor
+IMAGE_0003.jpg,glioma_tumor
+IMAGE_0004.jpg,meningioma_tumor
+IMAGE_0005.jpg,meningioma_tumor
+IMAGE_0006.jpg,no_tumor
+IMAGE_0007.jpg,glioma_tumor
+IMAGE_0008.jpg,glioma_tumor
+IMAGE_0009.jpg,pituitary_tumor
+IMAGE_0010.jpg,pituitary_tumor
+IMAGE_0011.jpg,glioma_tumor
