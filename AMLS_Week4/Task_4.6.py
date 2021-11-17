@@ -62,14 +62,12 @@ print('Accuracy Score on test data: ', round(accuracy_score(y_true=y_test, y_pre
 print('6.1 Visualise Tree Structure:\n')
 def visualise_tree(tree_to_print):
     plt.figure()
-
-    fig, axes = plt.subplots(nrows = 1,ncols = 1,figsize = (10,10), dpi=800)
     tree.plot_tree(tree_to_print,
                feature_names = iris.feature_names,
                class_names=iris.target_names,
                filled = True,
               rounded=True);
-
+    fig, axes = plt.subplots(nrows = 1,ncols = 1,figsize = (10,10), dpi=800)
     plt.show()
 
 # def visualise_tree(tree_to_print):
