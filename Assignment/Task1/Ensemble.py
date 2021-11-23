@@ -6,6 +6,7 @@ from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -63,6 +64,7 @@ def load_labels(label_file_path):
     labels = np.array(labels)
     return labels
 
+
 def image_to_feature_vector(images_array, size=(512, 512)):
 	# resize the image to a fixed size, then flatten the image into
 	# a list of raw pixel intensities
@@ -76,17 +78,17 @@ def image_to_feature_vector(images_array, size=(512, 512)):
 
 
 def Bagging_Classifier(X_train, y_train, X_test,k):
-    bagmodel=BaggingClassifier(n_estimators=k,max_samples=0.5, max_features=4,random_state=1)  #Create KNN object with a K coefficient
-    bagmodel.fit(X_train, y_train)      #Fit KNN model
-    Y_pred_BAG = bagmodel.predict(X_test)
-    return Y_pred_BAG
+    bag_clf = BaggingClassifier(n_estimators=k,max_samples=0.5, max_features=4,random_state=1)  #Create KNN object with a K coefficient
+    bag_clf.fit(X_train, y_train)      #Fit KNN model
+    Y_pred_BAG = bag_clf.predict(X_test)
+    return Y_pred_BAG, bag_clf
 
 
 def Boosting_Classifier(X_train, Y_train, X_test,k):
-    boostmodel=AdaBoostClassifier(n_estimators=k)       # AdaBoost takes Decision Tree as its base-estimator model by default.
-    boostmodel.fit(X_train,Y_train,sample_weight=None)  # Fit KNN model
-    Y_pred_BOOST = boostmodel.predict(X_test)
-    return Y_pred_BOOST
+    boost_clf = AdaBoostClassifier(n_estimators=k)       # AdaBoost takes Decision Tree as its base-estimator model by default.
+    boost_clf.fit(X_train,Y_train,sample_weight=None)  # Fit KNN model
+    Y_pred_BOOST = boost_clf.predict(X_test)
+    return Y_pred_BOOST, boost_clf
 
 
 #Get images (inputs) array
@@ -113,11 +115,8 @@ X_train,X_test,Y_train,Y_test=train_test_split(image_vectors,labels,test_size=0.
 print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(image_vectors)),3),round((len(Y_test)*1.0)/len(labels),3)))
 
 ########################################## BAGGING CLASSIFIER ######################################################
-Y_pred_BAG = Bagging_Classifier(X_train, Y_train, X_test,2)
-BAG_accuracy = metrics.accuracy_score(Y_test,Y_pred_BAG)
-print('\nBagging Method Accuracy on test data: {}%'.format(round(BAG_accuracy*100,2)))
 
-# #Estimators Tunning
+# #1. Estimators Tunning
 # BAG_accuracies_df = pd.DataFrame(list(range(1,31)), columns=["k"])
 # accuracies = []
 # estimators_range = [8, 12]
@@ -127,8 +126,8 @@ print('\nBagging Method Accuracy on test data: {}%'.format(round(BAG_accuracy*10
 #
 # BAG_accuracies_df['accuracies']=accuracies
 # print(BAG_accuracies_df)
-#
-#Estimators Visualisation
+
+# #2. Estimators Visualisation
 # fig, ax = plt.subplots()
 # ax.scatter(BAG_accuracies_df['k'], BAG_accuracies_df['accuracies'])
 # ax.set(title = 'Accuracy against number of estimators',
@@ -136,12 +135,33 @@ print('\nBagging Method Accuracy on test data: {}%'.format(round(BAG_accuracy*10
 # plt.title('Accuracy against number of number of estimators', weight = 'bold')
 # plt.show()
 
-########################################## BOOSTING CLASSIFIER ######################################################
-Y_pred_BOOST = Boosting_Classifier(X_train, Y_train, X_test, 2)
-BOOST_accuracy=metrics.accuracy_score(Y_test,Y_pred_BOOST)
-print('\nBoosting Method Accuracy on test data: {}%'.format(round(BOOST_accuracy*100,2)))
+# 3. Fit Bagging model with KNN for K = 2 and get accuracy score
+Y_pred_BAG, bag_clf = Bagging_Classifier(X_train, Y_train, X_test,2)
+BAG_accuracy = metrics.accuracy_score(Y_test,Y_pred_BAG)
+print('\nBagging Method Accuracy on test data: {}%'.format(round(BAG_accuracy*100,2)))
 
-# #Estimators Tunning
+# 4. Plot non-normalized confusion matrix
+titles_options = [
+    ("Bagging Confusion matrix, without normalization", None),
+    #("Bagging Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        bag_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()
+
+########################################## BOOSTING CLASSIFIER ######################################################
+
+# #1. Estimators Tunning
 # BOOST_accuracies_df = pd.DataFrame(list(range(1,31)), columns=["k"])
 # accuracies1 = []
 # estimators_range = [8, 12]
@@ -151,11 +171,35 @@ print('\nBoosting Method Accuracy on test data: {}%'.format(round(BOOST_accuracy
 #
 # BOOST_accuracies_df['accuracies']=accuracies1
 # print(BOOST_accuracies_df)
-#
-# #Estimators Visualisation
+
+# #2. Estimators Visualisation
 # fig, ax = plt.subplots()
 # ax.scatter(BOOST_accuracies_df['k'], BOOST_accuracies_df['accuracies'])
 # ax.set(title = 'Accuracy against number of estimators',
 #         ylabel='Accuracy',xlabel='K', ylim=[92, 100])
 # plt.title('Accuracy against number of number of estimators', weight = 'bold')
 # plt.show()
+
+# 3. Fit ADABOOST model with Decision Three for K = 2 and get accuracy score
+Y_pred_BOOST, boost_clf = Boosting_Classifier(X_train, Y_train, X_test, 2)
+BOOST_accuracy = metrics.accuracy_score(Y_test,Y_pred_BOOST)
+print('\nBagging Method Accuracy on test data: {}%'.format(round(BOOST_accuracy*100,2)))
+
+# 4. Plot non-normalized confusion matrix
+titles_options = [
+    ("Boosting Confusion matrix, without normalization", None),
+    #("Boosting Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        boost_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()

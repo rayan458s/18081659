@@ -1,9 +1,9 @@
 import imageio
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn.decomposition import PCA
-from sklearn import svm
 from sklearn.feature_selection import SelectPercentile, chi2
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn import tree
@@ -79,14 +79,15 @@ def image_array_to_vector(images_array, size=(512, 512)):
     return image_vectors
 
 
-def KNN_Classifier(X_train, Y_train, X_test,k):
-    KNN_clf = KNeighborsClassifier(n_neighbors=k)     #Create KNN object with a K coefficient
-    KNN_clf.fit(X_train, Y_train) # Fit KNN model
-    Y_pred_KNN = KNN_clf.predict(X_test)
-    return Y_pred_KNN, KNN_clf
+def SVM_Classifier(X_train,Y_train, X_test, kernel):
+    svm_clf = SVC(kernel=kernel)
+    svm_clf.fit(X_train,Y_train)
+    y_pred = svm_clf.predict(X_test)
+    return y_pred, svm_clf
 
 
 ########################################## DATA PROCESSING ######################################################
+
 #Get images (inputs) array
 images_array, class_name = load_images(img_folder)
 images_array = np.array(images_array)
@@ -106,74 +107,43 @@ images_vectors = image_array_to_vector(images_array)
 print("\nVector Size: {}".format(len(images_vectors[0])))
 
 
+
 #Split train an test dataset
 X_train,X_test,Y_train,Y_test=train_test_split(images_vectors,labels,test_size=0.2,random_state=3)
 print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(images_vectors)),3),round((len(Y_test)*1.0)/len(labels),3)))
 
-########################################## KNN CLASSIFIER ######################################################
+########################################## SVM CLASSIFIER ######################################################
 
-# #1. Fit KNN model for different values of k
-# estimators = [1,20]
-# accuracies_df = pd.DataFrame(list(range(1,estimators[1])), columns=["k"])
+# #1. Test SVM model accuracy for different Kernel
+# kernels = ["linear", "rbf"]
+# accuracies_df = pd.DataFrame(list(range(1,3)), columns=["kernels"])
 # accuracies = []
-# for i in range(estimators[0],estimators[1]):
-#     Y_pred_KNN = KNN_Classifier(X_train, Y_train, X_test,i)
-#     accuracies.append(round(accuracy_score(Y_test,Y_pred_KNN),3)*100)
-#     print('Accuracy for k={} computed'.format(i))
-#
+# for kernel in kernels:
+#     Y_pred_SVM, svm_clf = SVM_Classifier(X_train, Y_train, X_test,kernel)
+#     accuracies.append(round(accuracy_score(Y_test,Y_pred_SVM),2)*100)
+#     print('\nAccuracy for kernel = {} computed'.format(kernel))
 # accuracies_df['accuracies']=accuracies
-# print('KNN Accuracy Score on Test data:\n',accuracies_df)
-# print('The value of K should be below {}'.format(round(np.sqrt(len(X_train)))))
-#
-# #2. Plot accuracy vs k
+
+# #2. Plot accuracy vs kernel
 # fig, ax = plt.subplots()
-# ax.scatter(accuracies_df['k'], accuracies_df['accuracies'])
-# ax.set(title = 'Accuracy against number of neighbors K',
-#             ylabel='Accuracy (%)',xlabel='Number of Estimators K', ylim=[60, 100])
-# plt.title('Accuracy against number of neighbors K', weight = 'bold')
+# ax.scatter(accuracies_df['kernels'], accuracies_df['accuracies'])
+# ax.set(title = 'Accuracy against type of Kernel',
+#             ylabel='Accuracy (%)',xlabel='Kernel', ylim=[60, 100])
+# plt.title('Accuracy against type of Kernel', weight = 'bold')
 # plt.show()
 
-# 3. Fit KNN model for K = 10 and get accuracy score
-Y_pred, KNN_clf = KNN_Classifier(X_train, Y_train, X_test,16)
-print('KNN Accuracy Score on Test data: {}\n'.format(round(metrics.accuracy_score(Y_test,Y_pred),3)*100))
+# 3. Fit SVM model for linear Kernel and get accuracy score
+Y_pred, svm_clf = SVM_Classifier(X_train, Y_train, X_test,"rbf")
+print('\nSVM Accuracy Score on Test data: {}\n'.format(round(metrics.accuracy_score(Y_test,Y_pred),3)*100))
 
-# 4. Get information for confusion matrix
-positives = 0
-negatives = 0
-true_positives = 0
-false_negatives = 0
-true_negatives = 0
-false_positives = 0
-for i in range(len(Y_test)):
-    if Y_pred[i] == 1:
-        positives += 1
-        if Y_test[i] == 1:
-            true_positives += 1
-        else:
-            false_positives += 1
-    if Y_pred[i] == 0:
-        negatives += 1
-        if Y_test[i] == 0:
-            true_negatives += 1
-        else:
-            false_negatives += 1
-
-print('Predicted Positives: {}'.format(positives))
-print('True positives: {}'.format(true_positives))
-print('False positives: {}'.format(false_positives))
-
-print('Predicted Negatives: {}'.format(negatives))
-print('True negatives: {}'.format(true_negatives))
-print('False negatives: {}\n'.format(false_negatives))
-
-# 5. Plot non-normalized confusion matrix
+# 4. Plot non-normalized confusion matrix
 titles_options = [
-    ("KNN Confusion matrix, without normalization", None),
-    #("KNN Normalized confusion matrix", "true"),
+    ("SVM Confusion matrix, without normalization", None),
+    #("SVM Normalized confusion matrix", "true"),
 ]
 for title, normalize in titles_options:
     disp = ConfusionMatrixDisplay.from_estimator(
-        KNN_clf,
+        svm_clf,
         X_test,
         Y_test,
         display_labels=["No Tumor", "Tumor"],

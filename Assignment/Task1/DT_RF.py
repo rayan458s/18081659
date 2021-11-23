@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score
 import numpy as np
 import os
@@ -15,6 +16,7 @@ import random
 import csv
 import cv2
 import pandas as pd
+
 
 
 IMG_WIDTH=200
@@ -75,16 +77,16 @@ def image_to_feature_vector(images_array, size=(512, 512)):
     return image_vectors
 
 def Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params):
-    clf = tree.DecisionTreeClassifier( **tree_params )      #Define the decision three classifier
-    clf.fit(X_train,Y_train)
-    Y_pred_DT =  clf.predict(X_test)
-    return Y_pred_DT, clf
+    dt_clf = tree.DecisionTreeClassifier( **tree_params )      #Define the decision three classifier
+    dt_clf.fit(X_train,Y_train)
+    Y_pred_DT =  dt_clf.predict(X_test)
+    return Y_pred_DT, dt_clf
 
 def Random_Forest_Classifier(X_train, Y_train, X_test):
-    clf = RandomForestClassifier(n_estimators=100)   #Define the random forest classifier
-    clf.fit(X_train,Y_train)        #Train the model using the training sets
-    Y_pred_RF = clf.predict(X_test)      # prediction on test set
-    return Y_pred_RF, clf
+    rf_clf = RandomForestClassifier(n_estimators=100)   #Define the random forest classifier
+    rf_clf.fit(X_train,Y_train)        #Train the model using the training sets
+    Y_pred_RF = rf_clf.predict(X_test)      # prediction on test set
+    return Y_pred_RF, rf_clf
 
 def visualise_tree(tree_to_print):
     plt.figure()
@@ -120,32 +122,96 @@ print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(ima
 
 ########################################## DT CLASSIFIER ######################################################
 
-#Fit DT model
+# 1. Fit Decisiton Three model and get accuracy
 tree_params={'criterion':'entropy'}
-Y_pred_DT, clf_DT = Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
-DT_accuracy = round(accuracy_score(Y_test,Y_pred_DT),32)*100
-print('Decision Tree Accuracy Score on Test data: {}%'.format(DT_accuracy))
+Y_pred_DT, dt_clf = Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
+DT_accuracy = round(accuracy_score(Y_test,Y_pred_DT),2)*100
+print('\nDecision Tree Accuracy Score on Test data: {}%'.format(DT_accuracy))
 
-#Decision Three visualisation
-visualise_tree(clf_DT)
-# Add  decision boundary +
+# 2. Decision Three visualisation
+visualise_tree(dt_clf)
 
-# Hyperparameter Tuning
-# tree_params = {'criterion': 'entropy', 'min_samples_split':50}
-# Y_pred_DT = Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
-# print('Decision Tree Accuracy Score on Test data: {}%'.format(DT_accuracy))
+# 3. Decision boundary Visualisation
 
-# Add new three visualisation + new decision boundary +
+# 4. Plot non-normalized confusion matrix
+titles_options = [
+    ("Decision Three Confusion matrix, without normalization", None),
+    #(" Decision Three Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        dt_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()
+
+
+# 5. Hyperparameter Tuning
+tree_params = {'criterion': 'entropy', 'min_samples_split':50}
+Y_pred_DT_2, dt_clf_2 = Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
+print('\nDecision Tree with Tuning Accuracy Score on Test data: {}%'.format(DT_accuracy))
+
+# 6. Decision Three visualisation after tuning
+visualise_tree(dt_clf_2)
+
+# 7. Visualise  decision boundary after tuning
+
+# 8. Plot non-normalized confusion matrix after tuning
+titles_options = [
+    ("Decision Three Confusion matrix, without normalization", None),
+    #(" Decision Three Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        dt_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()
 
 ########################################## RF CLASSIFIER ######################################################
 
-Y_pred_RF, clf_RF = Random_Forest_Classifier(X_train, Y_train, X_test)
+# 1. Fit Random Forest model and get accuracy score
+Y_pred_RF, rf_clf = Random_Forest_Classifier(X_train, Y_train, X_test)
 RF_accuracy = round(accuracy_score(Y_test, Y_pred_RF),2)*100
 print("Random Forest Accuracy Score on Test data: {}%".format(RF_accuracy))
 
-#Random Forest  visualisation
-visualise_tree(clf_RF)
+# 2. Random Forest  visualisation
+for index in range(0, 5):
+    visualise_tree(rf_clf.estimators_[index])
 
-# Add decision boundary + remove unimportant features + retrain and re-visualise
+# Decision boundary Visualisation
 
+# 3. Plot non-normalized confusion matrix
+titles_options = [
+    ("Random Forest Confusion matrix, without normalization", None),
+    #("Random Forest Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        rf_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()
 
+# 4. Remove unimportant features + retrain and re-visualise

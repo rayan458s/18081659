@@ -8,6 +8,7 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import ConfusionMatrixDisplay
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -75,10 +76,10 @@ def image_to_feature_vector(images_array, size=(512, 512)):
     return image_vectors
 
 def Logistic_Classifier(X_train, Y_train, X_test, Y_test):
-    logreg = LogisticRegression(solver='lbfgs')     # Build Logistic Regression Model
-    logreg.fit(X_train, Y_train)            # Train the model using the training sets
-    Y_pred= logreg.predict(X_test)
-    return Y_pred
+    logistic_clf = LogisticRegression(solver='lbfgs')     # Build Logistic Regression Model
+    logistic_clf.fit(X_train, Y_train)            # Train the model using the training sets
+    Y_pred= logistic_clf.predict(X_test)
+    return Y_pred, logistic_clf
 
 ########################################## DATA PROCESSING ######################################################
 #Get images (inputs) array
@@ -107,6 +108,25 @@ print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(ima
 
 ########################################## LOGISTIC CLASSIFIER ######################################################
 
-# Fit Logistic model for K = 10 and get accuracy score
-Y_pred = Logistic_Classifier(X_train, Y_train, X_test, Y_test)
+# 1. Fit Logistic model for K = 10 and get accuracy score
+Y_pred, logistic_clf = Logistic_Classifier(X_train, Y_train, X_test, Y_test)
 print('\nLogistic Classifier Accuracy on test data:{}'.format(round(metrics.accuracy_score(Y_test,Y_pred),3)*100))
+
+# 2. Plot non-normalized confusion matrix
+titles_options = [
+    ("Logistic Confusion matrix, without normalization", None),
+    #("Logistic Normalized confusion matrix", "true"),
+]
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay.from_estimator(
+        logistic_clf,
+        X_test,
+        Y_test,
+        display_labels=["No Tumor", "Tumor"],
+        cmap=plt.cm.Blues,
+        normalize=normalize,
+    )
+    disp.ax_.set_title(title)
+    #print(title)
+    #print(disp.confusion_matrix)
+plt.show()
