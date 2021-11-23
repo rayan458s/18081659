@@ -17,102 +17,49 @@ import csv
 import cv2
 import pandas as pd
 
+from Assignment.Package import data_processing as dt
 
-IMG_WIDTH=200
-IMG_HEIGHT=200
 img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image_small'
-label_file = r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/label_small.csv'
+label_file = r'/Assignment/dataset/label_small.csv'
 
 
-def plot_4_images():
-    plt.figure(figsize=(20,20))
-    for i in range(4):
-        file = random.choice(os.listdir(img_folder))
-        image_path= os.path.join(img_folder, file)
-        img = np.array(imageio.imread(image_path))
-        ax=plt.subplot(2,2,i+1)
-        ax.title.set_text(file)
-        plt.imshow(img)
-    plt.show()
-
-
-def load_images(img_folder):
-    images_array=[]
-    class_name=[]
-    for file in os.listdir(img_folder):     #for all the files in dataset/image
-        #print('Loading {}'.format(file))
-        image_path = os.path.join(img_folder, file)      #join the path to the image filename
-        image = np.array(imageio.imread(image_path))             #open and convert to numpy array
-        #image= np.resize(image,(IMG_HEIGHT,IMG_WIDTH,3))        #rescale
-        #image = image.astype('float32')                         #converto to float
-        #image /= 255
-        images_array.append(image)                    #final list with all the image arrays
-        class_name.append(file)                             #image names
-    return images_array , class_name
-
-
-def load_labels(label_file_path):
-    open_file = open(label_file_path)
-    read_file = csv.reader(open_file, delimiter=',')
-    labels = []
-    for row in read_file:
-        if row[1] == 'no_tumor':
-           labels.append(0)
-        else:
-            labels.append(1)
-    labels.pop(0)
-    labels = np.array(labels)
-    return labels
-
-
-def image_to_feature_vector(images_array, size=(512, 512)):
-	# resize the image to a fixed size, then flatten the image into
-	# a list of raw pixel intensities
-    image_vectors = []
-    for i in range(len(images_array)):
-        image = images_array[i]
-        image_vector = cv2.resize(image, size).flatten()
-        image_vectors.append(image_vector)
-    image_vectors = np.array(image_vectors)
-    return image_vectors
-
-
-def Bagging_Classifier(X_train, y_train, X_test,k):
-    bag_clf = BaggingClassifier(n_estimators=k,max_samples=0.5, max_features=4,random_state=1)  #Create KNN object with a K coefficient
-    bag_clf.fit(X_train, y_train)      #Fit KNN model
-    Y_pred_BAG = bag_clf.predict(X_test)
-    return Y_pred_BAG, bag_clf
-
-
-def Boosting_Classifier(X_train, Y_train, X_test,k):
-    boost_clf = AdaBoostClassifier(n_estimators=k)       # AdaBoost takes Decision Tree as its base-estimator model by default.
-    boost_clf.fit(X_train,Y_train,sample_weight=None)  # Fit KNN model
-    Y_pred_BOOST = boost_clf.predict(X_test)
-    return Y_pred_BOOST, boost_clf
-
-
+########################################## DATA PROCESSING ######################################################
 #Get images (inputs) array
-images_array, class_name = load_images(img_folder)
+images_array, class_name = dt.load_images(img_folder)
 images_array = np.array(images_array)
 
 print("\nDataset shape: {}".format(images_array.shape))
 a,b,c,d = images_array.shape
-print("\nNumber of Images: {}".format(a))
 print("\nImage Size: {}x{}x{}".format(b,c,d))
+print("\nNumber of Images: {}".format(a))
 
 #Get labels (outputs) array
-labels = load_labels(label_file)
+labels = dt.load_labels(label_file)
 #print(labels)
 print("\nNumber of Labels: {}".format(len(labels)))
 
-#Array to Feature Vectors
-image_vectors = image_to_feature_vector(images_array)
-print("\nNumber of Images: {}".format(len(image_vectors)))
-print("\nFeature Vector Size: {}".format(len(image_vectors[0])))
+#Array to  Vectors
+images_vectors = dt.image_array_to_vector(images_array)
+print("\nVector Size: {}".format(len(images_vectors[0])))
+
+#Select 10 Features using ANOVA
+k_ANOVA = 10
+images_features = dt.select_features_with_ANOVA(images_vectors, labels, k_ANOVA)
+print("\nSelected number of features: {}".format(k_ANOVA))
+print("\nFinal Input Data Shape: {}".format(np.array(images_features).shape))
 
 #Split train an test dataset
-X_train,X_test,Y_train,Y_test=train_test_split(image_vectors,labels,test_size=0.2,random_state=3)
-print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(image_vectors)),3),round((len(Y_test)*1.0)/len(labels),3)))
+X_train,X_test,Y_train,Y_test=train_test_split(images_features,labels,test_size=0.2,random_state=3)
+print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(images_features)),3),round((len(Y_test)*1.0)/len(labels),3)))
+
+#Plot the features importances
+forest_importances, std = dt.get_features_importance_with_RF(X_train, Y_train)
+fig, ax = plt.subplots()            #define the plot object
+forest_importances.plot.bar(yerr=std, ax=ax)        #plot ar graph
+ax.set_title("SVM with Anova Feature importances using MDI")       #set title
+ax.set_ylabel("Mean decrease in impurity")      #set y-label
+fig.tight_layout()
+plt.show()
 
 ########################################## BAGGING CLASSIFIER ######################################################
 
@@ -121,7 +68,7 @@ print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(ima
 # accuracies = []
 # estimators_range = [8, 12]
 # for i in range(estimators_range[0],estimators_range[1]):
-#     Y_pred = Bagging_Classifier(X_train, Y_train, X_test,i)
+#     Y_pred = dt.Bagging_Classifier(X_train, Y_train, X_test,i)
 #     accuracies.append(round(metrics.accuracy_score(Y_test,Y_pred),3)*100)
 #
 # BAG_accuracies_df['accuracies']=accuracies
@@ -136,7 +83,7 @@ print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(ima
 # plt.show()
 
 # 3. Fit Bagging model with KNN for K = 2 and get accuracy score
-Y_pred_BAG, bag_clf = Bagging_Classifier(X_train, Y_train, X_test,2)
+Y_pred_BAG, bag_clf = dt.Bagging_Classifier(X_train, Y_train, X_test,2)
 BAG_accuracy = metrics.accuracy_score(Y_test,Y_pred_BAG)
 print('\nBagging Method Accuracy on test data: {}%'.format(round(BAG_accuracy*100,2)))
 
@@ -166,7 +113,7 @@ plt.show()
 # accuracies1 = []
 # estimators_range = [8, 12]
 # for i in range(estimators_range[0],estimators_range[1]):
-#     Y_pred = BOOST_accuracy(X_train, Y_train, X_test,i)
+#     Y_pred = dt.BOOST_accuracy(X_train, Y_train, X_test,i)
 #     accuracies1.append(round(metrics.accuracy_score(Y_test,Y_pred),3)*100)
 #
 # BOOST_accuracies_df['accuracies']=accuracies1
@@ -181,7 +128,7 @@ plt.show()
 # plt.show()
 
 # 3. Fit ADABOOST model with Decision Three for K = 2 and get accuracy score
-Y_pred_BOOST, boost_clf = Boosting_Classifier(X_train, Y_train, X_test, 2)
+Y_pred_BOOST, boost_clf = dt.Boosting_Classifier(X_train, Y_train, X_test, 2)
 BOOST_accuracy = metrics.accuracy_score(Y_test,Y_pred_BOOST)
 print('\nBagging Method Accuracy on test data: {}%'.format(round(BOOST_accuracy*100,2)))
 
