@@ -50,9 +50,7 @@ print("\nVector Size: {}".format(len(images_vectors[0])))
 
 #Dimension Reduction using PCA (feature extraction)
 k_PCA = 50
-print('debug')
 SingularValue, Variance, Vcomponent = dt.reduce_dimensionality_with_PCA(images_vectors,k_PCA)
-print('debug1')
 images_features = []
 single_image_feature = []
 for image_vector in images_vectors:
@@ -76,7 +74,7 @@ print('\ntrain set: {}  | test set: {}'.format(round(((len(Y_train)*1.0)/len(ima
 forest_importances, std = dt.get_features_importance_with_RF(X_train, Y_train)
 fig, ax = plt.subplots()            #define the plot object
 forest_importances.plot.bar(yerr=std, ax=ax)        #plot ar graph
-ax.set_title("SVM with Anova Feature importances using MDI")       #set title
+ax.set_title("SVM with PCA+Anova Feature importances using MDI")       #set title
 ax.set_ylabel("Mean decrease in impurity")      #set y-label
 fig.tight_layout()
 plt.show()
@@ -107,7 +105,7 @@ print('\nSVM Accuracy Score on Test data: {}\n'.format(round(metrics.accuracy_sc
 
 # 4. Plot non-normalized confusion matrix
 titles_options = [
-    ("SVM (no feature selection) Confusion matrix, without normalization", None),
+    ("SVM (PCA+ANOVA) Confusion matrix, without normalization", None),
     #("SVM Normalized confusion matrix", "true"),
 ]
 for title, normalize in titles_options:

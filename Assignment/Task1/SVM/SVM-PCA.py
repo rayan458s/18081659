@@ -21,8 +21,8 @@ import cv2
 import pandas as pd
 
 
-img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image_small'
-label_file = r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/label_small.csv'
+img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image'
+label_file = r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/label.csv'
 
 from Assignment.Package import data_processing as dt
 
