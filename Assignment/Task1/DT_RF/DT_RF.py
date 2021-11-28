@@ -12,34 +12,55 @@ from Assignment.Package import data_processing as dt
 
 ########################################## DATA PROCESSING ######################################################
 
-images_vectors, labels = dt.process_data()
+images_vectors, labels = dt.process_data()      #process all the images into pixel vectors and get the labels
+#WARNING ONLY 5 AND 10 FEATURES MODES HAVE BEEN PROCESSED FOR ANOVA and PCA, IF YOU WISH TO USE A DIFFERENT NUMBER OF
+#FEATURES YOU NEED TO FIRST USE THE dt.process_ANOVA_features(n_features) or dt.process_PCA_features(n_features) functions
+n_features = 5     #define the number of features to select/project from the pixels vectors
+dim_reduction = "PCA"
+if dim_reduction == "ANOVA":
+    images_features = dt.get_ANOVA_features(n_features)     #select the desired number of feartures using ANOVA
+elif dim_reduction == "PCA":
+    images_features = dt.get_PCA_features(n_features)     #project the desired number of feartures using PCA
+else:
+    print('\nNot a valid dimensionality reduction technique\n')
 
 #Split train an test dataset
-X_train,X_test,Y_train,Y_test=train_test_split(images_vectors,labels,test_size=0.2,random_state=3)
-print('\ntrain set: {}  | test set: {}\n'.format(round(((len(Y_train)*1.0)/len(images_vectors)),3),round((len(Y_test)*1.0)/len(labels),3)))
+X_train,X_test,Y_train,Y_test=train_test_split(images_features,labels,test_size=0.2,random_state=3)
+print('\ntrain set: {}  | test set: {}\n'.format(round(((len(Y_train)*1.0)/len(images_features)),3),round((len(Y_test)*1.0)/len(labels),3)))
 
+# #Plot the features importances
+# forest_importances, std = dt.get_features_importance_with_RF(X_train, Y_train)
+# fig, ax = plt.subplots()            #define the plot object
+# forest_importances.plot.bar(yerr=std, ax=ax)        #plot bar graph
+# ax.set_title(f"{dim_reduction} ({n_features}) Feature Importances Using MDI")       #set title
+# ax.set_ylabel("Mean decrease in impurity")      #set y-label
+# fig.tight_layout()
+# plt.show()
 
 ########################################## DT CLASSIFIER ######################################################
 
 # 1. Fit Decision Three model
-tree_params={'criterion':'entropy'}
-start_time = time.time()
-Y_pred_DT, dt_clf = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
-elapsed_time = time.time() - start_time
-print(f"Elapsed time to classify the data using Decision Three (No Features Selection) Classifier: {elapsed_time/60:.2f} minutes")
+tree_params={'criterion':'entropy'}     #define three parameters
+start_time = time.time()        #start the time counter (to determine the time taken to classify the data
+Y_pred_DT, dt_clf = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)      #classify the data using the Decision Three Classifier
+elapsed_time = time.time() - start_time     #get the elapsed time since the counter was started
+print(f"Elapsed time to classify the data using Decision Three ({dim_reduction} {n_features}) Classifier: {elapsed_time:.2f} seconds")
 
 # 2. Get Performance Scores
 DT_accuracy = round(accuracy_score(Y_test,Y_pred_DT),2)*100     #get accuracy
 DT_precision = round(precision_score(Y_test,Y_pred_DT),2)*100       #get precision
-DT_recall = round(recall_score(Y_test,Y_pred_DT),2)*100
-print('\nDecision Tree (No Features Selection) Accuracy Score on Test data: {}%'.format(DT_accuracy))
-print('\nDecision Tree (No Features Selection) Precision Score on Test data: {}%'.format(DT_precision))
-print('\nDecision Tree (No Features Selection) Recall Score on Test data: {}%'.format(DT_recall))
+DT_recall = round(recall_score(Y_test,Y_pred_DT),2)*100         #get recall
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Accuracy Score on Test data: {DT_accuracy}%')
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Precision Score on Test data: {DT_precision}%')
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Recall Score on Test data: {DT_recall}%')
 
-# 3. Plot non-normalized confusion matrix
+# # 3. Decision Three visualisation
+# dt.visualise_tree(dt_clf)     #visualise three structure
+
+# 4. Plot non-normalized confusion matrix
 titles_options = [
-    ("Decision Three (No Features Selection) Confusion Matrix", None),
-    #("Regular Decision Three Normalized confusion matrix", "true"),
+    (f"Decision Three ({dim_reduction} {n_features}) Confusion Matrix", None),
+    #("Decision Three ({dim_reduction}) Normalized confusion matrix", "true"),    #in case we want the normalised matrix
 ]
 for title, normalize in titles_options:
     disp = ConfusionMatrixDisplay.from_estimator(
@@ -53,26 +74,26 @@ for title, normalize in titles_options:
     disp.ax_.set_title(title)
 plt.show()
 
-# 4. Hyperparameter Tuning
-tree_params = {'criterion': 'entropy', 'min_samples_split':50}
-start_time = time.time()
-Y_pred_DT2, dt_clf_2 = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)
-elapsed_time = time.time() - start_time
-print(f"\nElapsed time to classify the data using Decision Three (No Features Selection) Classifier after hyperparameters tuning: {elapsed_time/60:.2f} minutes")
+# 5. Hyperparameter Tuning
+tree_params = {'criterion': 'entropy', 'min_samples_split':50}      #change the min number of sample (mini-batch size)
+start_time = time.time()       #get the elapsed time since the counter was started
+Y_pred_DT2, dt_clf_2 = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)   #classify the data using the Decision Three Classifier with new parameters
+elapsed_time = time.time() - start_time         #get the elapsed time since the counter was started
+print(f"\nElapsed time to classify the data using Decision Three ({dim_reduction}{n_features}) Classifier after hyperparameters tuning: {elapsed_time:.2f} seconds")
 
-# 2. Get Performance Scores
+# 6. Get Performance Scores
 DT2_accuracy = round(accuracy_score(Y_test,Y_pred_DT2),2)*100     #get accuracy
 DT2_precision = round(precision_score(Y_test,Y_pred_DT2),2)*100       #get precision
-DT2_recall = round(recall_score(Y_test,Y_pred_DT2),2)*100
-print('\nDecision Tree (No Features Selection) (after tuning) Accuracy Score on Test data: {}%'.format(DT2_accuracy))
-print('\nDecision Tree (No Features Selection) (after tuning) Precision Score on Test data: {}%'.format(DT2_precision))
-print('\nDecision Tree (No Features Selection) (after tuning) Recall Score on Test data: {}%'.format(DT2_recall))
+DT2_recall = round(recall_score(Y_test,Y_pred_DT2),2)*100               #get recall
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Accuracy Score on Test data after tuning: {DT2_accuracy}%')
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Precision Score on Test data after tuning: {DT2_precision}%')
+print(f'\nDecision Tree ({dim_reduction} {n_features}) Recall Score on Test data after tuning: {DT2_recall}%')
 
 
-# 6. Plot non-normalized confusion matrix after tuning
+# 7. Plot non-normalized confusion matrix after tuning
 titles_options = [
-    ("Decision Three (No Features Selection) Confusion Matrix After Tuning", None),
-    #("Regular Decision Three Normalized confusion matrix", "true"),
+    (f"Decision Three ({dim_reduction} {n_features}) Confusion Matrix After Tuning", None),
+    #("Decision Three ({dim_reduction}) Normalized confusion matrix", "true"),    # in case we want the normalised matrix
 ]
 for title, normalize in titles_options:
     disp = ConfusionMatrixDisplay.from_estimator(
@@ -89,23 +110,27 @@ plt.show()
 ########################################## RF CLASSIFIER ######################################################
 
 # 1. Fit Random Forest model and get accuracy score
-start_time = time.time()
-Y_pred_RF, rf_clf = dt.Random_Forest_Classifier(X_train, Y_train, X_test)
-elapsed_time = time.time() - start_time
-print(f"\nElapsed time to classify the data using Random Forest (No Features Selection) Classifier: {elapsed_time/60:.2f} minutes")
+start_time = time.time()        #get the elapsed time since the counter was started
+Y_pred_RF, rf_clf = dt.Random_Forest_Classifier(X_train, Y_train, X_test)           #classify the data using the Random Forest Classifier
+elapsed_time = time.time() - start_time         #get the elapsed time since the counter was started
+print(f"\nElapsed time to classify the data using Random Forest ({dim_reduction}{n_features}) Classifier: {elapsed_time:.2f} seconds")
 
 # 2. Get Performance Scores
 RF_accuracy = round(accuracy_score(Y_test,Y_pred_RF),2)*100     #get accuracy
 RF_precision = round(precision_score(Y_test,Y_pred_RF),2)*100       #get precision
 RF_recall = round(recall_score(Y_test,Y_pred_RF),2)*100
-print('\nRandom Forest (No Features Selection) Accuracy Score on Test data: {}%'.format(RF_accuracy))
-print('\nRandom Forest (No Features Selection) Precision Score on Test data: {}%'.format(RF_accuracy))
-print('\nRandom Forest (No Features Selection) Recall Score on Test data: {}%'.format(RF_accuracy))
+print(f'\nRandom Forest ({dim_reduction} {n_features}) Accuracy Score on Test data: {RF_accuracy}%')
+print(f'\nRandom Forest ({dim_reduction} {n_features}) Precision Score on Test data: {RF_precision}%')
+print(f'\nRandom Forest ({dim_reduction} {n_features}) Recall Score on Test data: {RF_recall}%')
 
-# 3. Plot non-normalized confusion matrix
+# # 3. Random Forest  visualisation
+# for index in range(0, 5):
+#     dt.visualise_tree(rf_clf.estimators_[index])      #visualise 5 of the  threes structures of the random forest
+
+# 4. Plot non-normalized confusion matrix
 titles_options = [
-    ("Random Forest (No Features Selection) Confusion Matrix", None),
-    #("Regular Random Forest Normalized confusion matrix", "true"),
+    (f"Random Forest ({dim_reduction} {n_features}) Confusion Matrix", None),
+    #("{dim_reduction} Random Forest Normalized confusion matrix", "true"),       #In case we want the normalised matrix
 ]
 for title, normalize in titles_options:
     disp = ConfusionMatrixDisplay.from_estimator(

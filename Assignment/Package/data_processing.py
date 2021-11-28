@@ -22,126 +22,80 @@ import imutils
 import time
 
 
-img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image_small'
-label_file = r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/label_small.csv'
+img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image'
+label_file = r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/label.csv'
 
 
 def plot_4_images():
+    '''
+    Function to plot 4 images from the Tumor Datasets
+    '''
     plt.figure(figsize=(20,20))
     for i in range(4):
-        file = random.choice(os.listdir(img_folder))
-        image_path= os.path.join(img_folder, file)
-        img = np.array(imageio.imread(image_path))
-        ax=plt.subplot(2,2,i+1)
-        ax.title.set_text(file)
-        plt.imshow(img)
+        file = random.choice(os.listdir(img_folder))    #select 4 random file names
+        image_path= os.path.join(img_folder, file)          #create path for the dataset file
+        img = np.array(imageio.imread(image_path))              #convert the image to an array
+        ax=plt.subplot(2,2,i+1)                 #define the ax plot object
+        ax.title.set_text(file)     #set title
+        plt.imshow(img)         #show image
     plt.show()
 
 
 def load_images(img_folder):
+    '''
+    Input: the folder containing all the images of tumors MRI
+    Returns
+    - 'images_array': An array containing [3000images*512rows*512columns*3RGB] all the images (as numpy arrays)
+    - 'class_name': the names of every file containing an image
+    '''
     images_array=[]
     class_name=[]
     for file in os.listdir(img_folder):     #for all the files in dataset/image
-        #print('Loading {}'.format(file))
         image_path = os.path.join(img_folder, file)      #join the path to the image filename
         image = np.array(imageio.imread(image_path))             #open and convert to numpy array
-        #image = image.astype('float32')                         #converto to float
-        #image /= 255
         images_array.append(image)                    #final list with all the image arrays
         class_name.append(file)                             #image names
     return images_array , class_name
 
 
 def load_labels(label_file_path):
-    open_file = open(label_file_path)
-    read_file = csv.reader(open_file, delimiter=',')
-    labels = []
-    for row in read_file:
+    '''
+    Input: the file path for the csv file containing all the labels
+    Returns 'labels': A numpy array [3000] containing all the labels
+    '''
+    open_file = open(label_file_path)           #open the CSV file
+    read_file = csv.reader(open_file, delimiter=',')        #read the file using the csv.reader() function
+    labels = []     #list to store the labels
+    for row in read_file:       #go through every row in the csv file
         if row[1] == 'no_tumor':
            labels.append(0)
         else:
             labels.append(1)
-    labels.pop(0)
-    labels = np.array(labels)
+    labels.pop(0)       #remove the first row that contains a description the csv file
+    labels = np.array(labels)       #convert the list to a numpy array
     return labels
 
 
 def image_array_to_vector(images_array, size=(512, 512)):
-	# resize the image to a fixed size, then flatten the image into
-	# a list of raw pixel intensities
+    '''
+    Input: the numpy array containing all the images as arrays
+    Returns 'image_vectors': a numpy array containing all the images as vectors of pixel intensities
+    '''
     image_vectors = []
-    for i in range(len(images_array)):
+    for i in range(len(images_array)):      #for every image array
         image = images_array[i]
-        image_vector = cv2.resize(image, size).flatten()
-        image_vectors.append(image_vector)
+        image_vector = cv2.resize(image, size).flatten()        # resize the image to a fixed size (not modified)
+        image_vectors.append(image_vector)      #Flatten the image into a list of raw pixel intensities
     image_vectors = np.array(image_vectors)
     return image_vectors
 
 
-def select_features_with_ANOVA(X,Y, k):
-    fs = SelectKBest(score_func=f_classif, k=k)     # define feature selection
-    X_selected = fs.fit_transform(X, Y)     # apply feature selection
-    return X_selected
-
-
-def reduce_dimensionality_with_PCA(images_vectors, k):
-    '''
-    Inputs
-        X: dataset;
-        k: number of Components.
-
-    Return
-        SValue: The singular values corresponding to each of the selected components.
-        Variance: The amount of variance explained by each of the selected components.
-                It will provide you with the amount of information or variance each principal component holds after projecting the data to a lower dimensional subspace.
-        Vcomp: The estimated number of components.
-    '''
-    pca = PCA(n_components=k)   # the built-in function for PCA, where n_clusters is the number of clusters.
-    pca.fit(images_vectors)      # fit the algorithm with dataset
-
-    Variance = pca.explained_variance_ratio_
-    SValue = pca.singular_values_
-    Vcomp = pca.components_
-
-    images_features = []
-    single_image_feature = []
-    for image_vector in images_vectors:
-        for component in Vcomp:
-            single_image_feature.append(abs(np.dot(image_vector,component)))
-        images_features.append(single_image_feature)
-        single_image_feature = []
-    return np.array(images_features)
-
-
-def get_features_importance_with_RF(X_train, Y_train):
-    feature_names = [f"feature {i}" for i in range(X_train.shape[1])]       #Attribute a feature name to each vector row
-    forest = RandomForestClassifier(random_state=0)     #Define the random forest classifier object
-    forest.fit(X_train, Y_train)            #fit the random forest classifier model to training data
-    importances = forest.feature_importances_       #get importances of each feature
-    std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis=0)    #Compute standard deviation of the features importances
-    forest_importances = pd.Series(importances, index=feature_names)        #concatenante the features importances in a Pandas Serie
-    return forest_importances, std
-
-def extract_color_histogram(images, bins=(8, 8, 8)):
-	# extract a 3D color histogram from the HSV color space using
-	# the supplied number of `bins` per channel
-    features_vectors = []
-    for image in images:
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        hist = cv2.calcHist([hsv], [0, 1, 2], None, bins,[0, 180, 0, 256, 0, 256])
-        # handle normalizing the histogram if we are using OpenCV 2.4.X
-        if imutils.is_cv2():
-            hist = cv2.normalize(hist)
-        # otherwise, perform "in place" normalization in OpenCV 3 (I
-        # personally hate the way this is done
-        else:
-            cv2.normalize(hist, hist)
-        # return the flattened histogram as the feature vector
-    features_vectors.append(hist.flatten())
-    return features_vectors
-
-
 def process_data():
+    '''
+    Return
+        images_vectors: a numpy array containing all the images as vectors of pixel intensities
+        labels: a list with th dataset label
+    '''
     #Get images (inputs) array
     images_array, class_name = load_images(img_folder)
     images_array = np.array(images_array)
@@ -161,38 +115,123 @@ def process_data():
 
     return images_vectors, labels
 
+def select_features_with_ANOVA(images_vectors,labels, k):
+    '''
+    Inputs
+        images_vectors: dataset images vectors (pixel intensities)
+        labels: dataset labels
+        k: number of features we want to keep
+    Return
+        images_features: a numpy array with all the images as vectors of new K best ANOVA selected features
+    '''
+    fs = SelectKBest(score_func=f_classif, k=k)     # define feature selection
+    images_features = fs.fit_transform(images_vectors, labels)     # apply feature selection
+    return images_features
+
+
+def reduce_dimensionality_with_PCA(images_vectors, k):
+    '''
+    Inputs
+        images_vectors: dataset images vectors (pixel intensities)
+        k: number of Components
+    Return
+        images_features: a numpy array with all the images as vectors of new PCA projected features
+    '''
+    pca = PCA(n_components=k)   # the built-in function for PCA, where n_clusters is the number of clusters.
+    pca.fit(images_vectors)      # fit the algorithm with dataset
+    Vcomp = pca.components_ #The estimated number of components (eigenvectors)
+
+    images_features = []
+    single_image_feature = []
+    for image_vector in images_vectors:     #go through all the image vectors (pixel intensities)
+        for component in Vcomp:         #go through all the eigenvectors computed using PCA
+            single_image_feature.append(abs(np.dot(image_vector,component)))        #perform dot product between the each eigenvector and each image vector
+        images_features.append(single_image_feature)
+        single_image_feature = []
+    return np.array(images_features)
+
+
+def get_features_importance_with_RF(X_train, Y_train):
+    '''
+    Inputs
+        X_train: training images vectors of selected features
+        Y_train: training labels
+    Return
+        forest_importances: Panda Seroe with the  features importances values
+        std: the standard deviation of the feature importances
+    '''
+    feature_names = [f"feature {i}" for i in range(X_train.shape[1])]       #Attribute a feature name to each vector row
+    forest = RandomForestClassifier(random_state=0)     #Define the random forest classifier object
+    forest.fit(X_train, Y_train)            #fit the random forest classifier model to training data
+    importances = forest.feature_importances_       #get importances of each feature
+    std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis=0)    #Compute standard deviation of the features importances
+    forest_importances = pd.Series(importances, index=feature_names)        #concatenante the features importances in a Pandas Serie
+    return forest_importances, std
+
 
 def process_ANOVA_features(k_ANOVA):
-    images_vectors, labels = process_data()#Select 10 Features using ANOVA
-    start_time = time.time()
-    ANOVA_features = select_features_with_ANOVA(images_vectors, labels, k_ANOVA)
-    elapsed_time = time.time() - start_time
+    '''
+    Inputs
+        k_ANOVA: The number of features we want to keep
+    Return
+        ANOVA_features: A numpy array containing every image as a vector of ANOVA selected features
+    '''
+    images_vectors, labels = process_data()         #Select k Features using ANOVA
+    start_time = time.time()        #start the time counter
+    ANOVA_features = select_features_with_ANOVA(images_vectors, labels, k_ANOVA)        #reduce dimensionality using ANOVA (supervised technique)
+    elapsed_time = time.time() - start_time     #get the elapsed time since the counter started
     print(f"\nElapsed time to select features using ANOVA: {elapsed_time/60:.2f} minutes")
     print("\nSelected number of features: {}".format(k_ANOVA))
     print("\nFinal Input Data Shape: {}".format(np.array(ANOVA_features).shape))
-    np.savetxt('/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/ANOVA.dat', ANOVA_features)
+    file_path = '/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/ANOVA-'+str(k_ANOVA)+'.dat'    #file path tos ave the computed features
+    np.savetxt(file_path, ANOVA_features)       #save the computed features for re-use
     return ANOVA_features
 
 
 def process_PCA_features(k_PCA):
-    images_vectors, labels = process_data()#Select 10 Features using ANOVA
-    start_time = time.time()
-    PCA_features = reduce_dimensionality_with_PCA(images_vectors, k_PCA)
-    elapsed_time = time.time() - start_time
+    '''
+    Inputs
+        k_PCA: The number of features we want to keep
+    Return
+        PCA_features: A numpy array containing every image as a vector of PCA projected features
+    '''
+    images_vectors, labels = process_data()     #Project the data into 10 Features using PCA
+    start_time = time.time()        #start the time counter
+    PCA_features = reduce_dimensionality_with_PCA(images_vectors, k_PCA)        #reduce dimensionality using ANOVA (unsupervised technique)
+    elapsed_time = time.time() - start_time     #get the elapsed time since the counter started
     print(f"\nElapsed time to select features using PCA: {elapsed_time/60:.2f} minutes")
     print("\nSelected number of features: {}".format(k_PCA))
     print("\nFinal Input Data Shape: {}".format(np.array(PCA_features).shape))
-    np.savetxt('/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/PCA.dat', PCA_features)
+    file_path = '/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/PCA-'+str(k_PCA)+'.dat'   #file path tos ave the computed features
+    np.savetxt(file_path, PCA_features)         ##save the computed features for re-use
     return PCA_features
 
 
-def get_ANOVA_features():
-    ANOVA_features = np.loadtxt('/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/ANOVA-10.dat')
+def get_ANOVA_features(k_ANOVA):
+    '''
+    Inputs
+        k_ANOVA: The number of features we want to keep
+    Return
+        ANOVA_features: A numpy array containing every image as a vector of PCA projected features
+    '''
+    file_path = '/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/ANOVA-'+str(k_ANOVA)+'.dat'      #get filepath where we saved the previously computed features
+    ANOVA_features = np.loadtxt(file_path)      #load the features file
+    print("\nSelected number of features: {}".format(len(ANOVA_features[0])))
+    print("\nFinal Input Data Shape: {}".format(np.array(ANOVA_features).shape))
     return ANOVA_features
 
 
-def get_pca_features():
-    PCA_features = np.loadtxt('/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/ANOVA-10.dat')
+def get_PCA_features(k_PCA):
+    '''
+    Inputs
+        k_PCA: The number of features we want to keep
+    Return
+        PCA_features: A numpy array containing every image as a vector of PCA projected features
+    '''
+    file_path = '/Users/rayan/PycharmProjects/AMLS/Assignment/Task1/Dim-Reduction/PCA-'+str(k_PCA)+'.dat'   #get filepath where we saved the previously computed features
+    PCA_features = np.loadtxt(file_path)         #load the features file
+    print("\nSelected number of features: {}".format(len(PCA_features[0])))
+    print("\nFinal Input Data Shape: {}".format(np.array(PCA_features).shape))
     return PCA_features
 
 
@@ -233,8 +272,8 @@ def Bagging_Classifier(X_train, y_train, X_test,k):
     return Y_pred_BAG, bag_clf
 
 
-def Boosting_Classifier(X_train, Y_train, X_test,k):
-    boost_clf = AdaBoostClassifier(n_estimators=k)       # AdaBoost takes Decision Tree as its base-estimator model by default.
+def Boosting_Classifier(X_train, Y_train, X_test, estimator, k):
+    boost_clf = AdaBoostClassifier(base_estimator=estimator, n_estimators=k)       # AdaBoost takes Decision Tree as its base-estimator model by default.
     boost_clf.fit(X_train,Y_train,sample_weight=None)  # Fit KNN model
     Y_pred_BOOST = boost_clf.predict(X_test)
     return Y_pred_BOOST, boost_clf
