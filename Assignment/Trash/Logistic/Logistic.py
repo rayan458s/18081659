@@ -17,7 +17,7 @@ import csv
 import cv2
 import pandas as pd
 
-from Assignment.Package import data_processing as dt
+from Assignment.Functions import data_processing_T1 as dt
 
 img_folder=r'/Users/rayan/PycharmProjects/AMLS/Assignment/dataset/image_small'
 label_file = r'/Assignment/dataset/label_small.csv'

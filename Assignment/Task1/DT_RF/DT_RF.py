@@ -8,13 +8,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-from Assignment.Package import data_processing as dt
+from Assignment.Functions import data_processing_T1 as dt
+from Assignment.Functions import Classifiers as classf
 
 ########################################## DATA PROCESSING ######################################################
 
 images_vectors, labels = dt.process_data()      #process all the images into pixel vectors and get the labels
+
 #WARNING ONLY 5 AND 10 FEATURES MODES HAVE BEEN PROCESSED FOR ANOVA and PCA, IF YOU WISH TO USE A DIFFERENT NUMBER OF
 #FEATURES YOU NEED TO FIRST USE THE dt.process_ANOVA_features(n_features) or dt.process_PCA_features(n_features) functions
+
 n_features = 5     #define the number of features to select/project from the pixels vectors
 dim_reduction = "PCA"
 if dim_reduction == "ANOVA":
@@ -29,20 +32,14 @@ X_train,X_test,Y_train,Y_test=train_test_split(images_features,labels,test_size=
 print('\ntrain set: {}  | test set: {}\n'.format(round(((len(Y_train)*1.0)/len(images_features)),3),round((len(Y_test)*1.0)/len(labels),3)))
 
 # #Plot the features importances
-# forest_importances, std = dt.get_features_importance_with_RF(X_train, Y_train)
-# fig, ax = plt.subplots()            #define the plot object
-# forest_importances.plot.bar(yerr=std, ax=ax)        #plot bar graph
-# ax.set_title(f"{dim_reduction} ({n_features}) Feature Importances Using MDI")       #set title
-# ax.set_ylabel("Mean decrease in impurity")      #set y-label
-# fig.tight_layout()
-# plt.show()
+# dt.plot_features_importances(X_train, Y_train, dim_reduction, n_features)
 
 ########################################## DT CLASSIFIER ######################################################
 
 # 1. Fit Decision Three model
 tree_params={'criterion':'entropy'}     #define three parameters
 start_time = time.time()        #start the time counter (to determine the time taken to classify the data
-Y_pred_DT, dt_clf = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)      #classify the data using the Decision Three Classifier
+Y_pred_DT, dt_clf = classf.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)      #classify the data using the Decision Three Classifier
 elapsed_time = time.time() - start_time     #get the elapsed time since the counter was started
 print(f"Elapsed time to classify the data using Decision Three ({dim_reduction} {n_features}) Classifier: {elapsed_time:.2f} seconds")
 
@@ -55,7 +52,7 @@ print(f'\nDecision Tree ({dim_reduction} {n_features}) Precision Score on Test d
 print(f'\nDecision Tree ({dim_reduction} {n_features}) Recall Score on Test data: {DT_recall}%')
 
 # # 3. Decision Three visualisation
-# dt.visualise_tree(dt_clf)     #visualise three structure
+# classf.visualise_tree(dt_clf)     #visualise three structure
 
 # 4. Plot non-normalized confusion matrix
 titles_options = [
@@ -77,7 +74,7 @@ plt.show()
 # 5. Hyperparameter Tuning
 tree_params = {'criterion': 'entropy', 'min_samples_split':50}      #change the min number of sample (mini-batch size)
 start_time = time.time()       #get the elapsed time since the counter was started
-Y_pred_DT2, dt_clf_2 = dt.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)   #classify the data using the Decision Three Classifier with new parameters
+Y_pred_DT2, dt_clf_2 = classf.Decision_Tree_Classifier(X_train, Y_train, X_test, tree_params)   #classify the data using the Decision Three Classifier with new parameters
 elapsed_time = time.time() - start_time         #get the elapsed time since the counter was started
 print(f"\nElapsed time to classify the data using Decision Three ({dim_reduction}{n_features}) Classifier after hyperparameters tuning: {elapsed_time:.2f} seconds")
 
@@ -111,7 +108,7 @@ plt.show()
 
 # 1. Fit Random Forest model and get accuracy score
 start_time = time.time()        #get the elapsed time since the counter was started
-Y_pred_RF, rf_clf = dt.Random_Forest_Classifier(X_train, Y_train, X_test)           #classify the data using the Random Forest Classifier
+Y_pred_RF, rf_clf = classf.Random_Forest_Classifier(X_train, Y_train, X_test)           #classify the data using the Random Forest Classifier
 elapsed_time = time.time() - start_time         #get the elapsed time since the counter was started
 print(f"\nElapsed time to classify the data using Random Forest ({dim_reduction}{n_features}) Classifier: {elapsed_time:.2f} seconds")
 
@@ -125,7 +122,7 @@ print(f'\nRandom Forest ({dim_reduction} {n_features}) Recall Score on Test data
 
 # # 3. Random Forest  visualisation
 # for index in range(0, 5):
-#     dt.visualise_tree(rf_clf.estimators_[index])      #visualise 5 of the  threes structures of the random forest
+#     classf.visualise_tree(rf_clf.estimators_[index])      #visualise 5 of the  threes structures of the random forest
 
 # 4. Plot non-normalized confusion matrix
 titles_options = [

@@ -11,13 +11,12 @@ import matplotlib.pyplot as plt
 import time
 import pandas as pd
 
-from Assignment.Package import data_processing as dt
+from Assignment.Functions import data_processing_T1 as dt
+from Assignment.Functions import Classifiers as classf
 
 ########################################## DATA PROCESSING ######################################################
 
 images_vectors, labels = dt.process_data()      #process all the images into pixel vectors and get the labels
-#WARNING ONLY 5 AND 10 FEATURES MODES HAVE BEEN PROCESSED FOR ANOVA and PCA, IF YOU WISH TO USE A DIFFERENT NUMBER OF
-#FEATURES YOU NEED TO FIRST USE THE dt.process_ANOVA_features(n_features) or dt.process_PCA_features(n_features) functions
 n_features = 10     #define the number of features to select/project from the pixels vectors
 dim_reduction = "PCA"
 if dim_reduction == "ANOVA":
@@ -27,21 +26,12 @@ elif dim_reduction == "PCA":
 else:
     print('\nNot a valid dimensionality reduction technique\n')
 
-
 #Split train an test dataset
 X_train,X_test,Y_train,Y_test=train_test_split(images_features,labels,test_size=0.2,random_state=3)
 print('\ntrain set: {}  | test set: {}\n'.format(round(((len(Y_train)*1.0)/len(images_features)),3),round((len(Y_test)*1.0)/len(labels),3)))
 
-# #Plot the features importances
-# forest_importances, std = dt.get_features_importance_with_RF(X_train, Y_train)
-# fig, ax = plt.subplots()            #define the plot object
-# forest_importances.plot.bar(yerr=std, ax=ax)        #plot bar graph
-# ax.set_title(f"{dim_reduction} ({n_features}) Feature Importances Using MDI")       #set title
-# ax.set_ylabel("Mean decrease in impurity")      #set y-label
-# fig.tight_layout()
-# plt.show()
 
-########################################## BAGGING CLASSIFIER ######################################################
+########################################## BAGGING ######################################################
 
 #1. Estimators Tunning
 BAG_scores_df = pd.DataFrame(list(range(1,16)), columns=["k"])  #create pandas dataframe to containe the performance metrics for difference values of K
@@ -50,7 +40,7 @@ precisions = []
 recalls = []
 estimators_range = [1, 16]      #the range to test the number of nearest neighbors
 for i in range(estimators_range[0],estimators_range[1]):    #classify the data for every value of K using bagging and get accuracy, precision and recall metrics
-    Y_pred, bag_clf = dt.Bagging_Classifier(X_train, Y_train, X_test,i)
+    Y_pred, bag_clf = classf.Bagging_Classifier(X_train, Y_train, X_test,i)
     accuracies.append(round(metrics.accuracy_score(Y_test,Y_pred),2)*100)
     precisions.append(round(metrics.precision_score(Y_test,Y_pred),2)*100)
     recalls.append(round(metrics.recall_score(Y_test,Y_pred),2)*100)
@@ -76,7 +66,7 @@ plt.show()
 # 3. Fit Bagging model with KNN for K = 13 and get accuracy score
 K_bag = 13      #set the number of nearest neighbors for KNN for bagging
 start_time = time.time()
-Y_pred_BAG, bag_clf = dt.Bagging_Classifier(X_train, Y_train, X_test, K_bag)
+Y_pred_BAG, bag_clf = classf.Bagging_Classifier(X_train, Y_train, X_test, K_bag)
 elapsed_time = time.time() - start_time
 print(f"\nElapsed time to classify the data using Bagging ({dim_reduction} {n_features}) Classifier for K = {K_bag}: {elapsed_time:.2f} seconds")
 
@@ -105,7 +95,7 @@ for title, normalize in titles_options:
     disp.ax_.set_title(title)
 plt.show()
 
-########################################## BOOSTING CLASSIFIER ######################################################
+########################################## BOOSTING ######################################################
 
 #1. Estimators Tunning for Decision Three Estimator
 BOOST_scores_df = pd.DataFrame(list(range(1,16)), columns=["k"])
@@ -114,7 +104,7 @@ precisions = []
 recalls = []
 estimators_range = [1, 16]
 for i in range(estimators_range[0],estimators_range[1]):
-    Y_pred, boost_clf = dt.Boosting_Classifier(X_train, Y_train, X_test,None,i)
+    Y_pred, boost_clf = classf.Boosting_Classifier(X_train, Y_train, X_test,None,i)
     accuracies.append(round(metrics.accuracy_score(Y_test,Y_pred),2)*100)
     precisions.append(round(metrics.precision_score(Y_test,Y_pred),2)*100)
     recalls.append(round(metrics.recall_score(Y_test,Y_pred),2)*100)
@@ -143,7 +133,7 @@ precisions = []
 recalls = []
 estimators_range = [1, 16]
 for i in range(estimators_range[0],estimators_range[1]):
-    Y_pred, boost_clf = dt.Boosting_Classifier(X_train, Y_train, X_test,RandomForestClassifier(n_estimators=100),i)
+    Y_pred, boost_clf = classf.Boosting_Classifier(X_train, Y_train, X_test,RandomForestClassifier(n_estimators=100),i)
     accuracies.append(round(metrics.accuracy_score(Y_test,Y_pred),2)*100)
     precisions.append(round(metrics.precision_score(Y_test,Y_pred),2)*100)
     recalls.append(round(metrics.recall_score(Y_test,Y_pred),2)*100)
@@ -168,7 +158,7 @@ plt.show()
 # 5. Fit ADABOOST model with Decision Three for K = 2
 K_boost = 2
 start_time = time.time()
-Y_pred_BOOST, boost_clf = dt.Boosting_Classifier(X_train, Y_train, X_test, None, K_boost)
+Y_pred_BOOST, boost_clf = classf.Boosting_Classifier(X_train, Y_train, X_test, None, K_boost)
 elapsed_time = time.time() - start_time
 print(f"\nElapsed time to classify the data using Boosting with Decision Three ({dim_reduction} {n_features}) Classifier for K = {K_boost}: {elapsed_time:.2f} seconds")
 
