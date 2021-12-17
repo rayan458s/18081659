@@ -34,7 +34,7 @@ images_features = dt.get_features(filepath)     #project the desired number of f
 X, Y = images_features, labels
 
 # #Plot the features importances
-# dt.plot_features_importances(X, Y, dim_reduction, n_features)
+# dt.plot_features_importances(X, Y, dim_reduction, n_features)#
 
 # 3. Define the initial Random Forest Classifier Object
 rf_clf = RandomForestClassifier(n_estimators=30)    #create Random Forest claassifier instance
